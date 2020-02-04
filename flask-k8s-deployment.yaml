@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: flask-basic
+  labels:
+    app.io.service: flask-basic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.io.service: flask-basic
+  template:
+    metadata:
+      labels:
+        app.io.service: flask-basic
+    spec:
+      containers:
+        - name: flask-basic
+          image: avarf/k8s-flask:latest
+          ports:
+            - containerPort: 5000
+          resources:
+            requests:
+              cpu: 0.1
+              memory: 50Mi
+            limits:
+              cpu: 0.5
+              memory: 450Mi
+      restartPolicy: Always
+      #imagePullSecrets:
+      #- name: mysecret
+status: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  annotations:
+    Process: flask-basic
+  creationTimestamp: null
+  labels:
+    app.io.service: flask-basic
+  name: flask-basic
+spec:
+  ports:
+  - name: "p1"
+    port: 5000
+    targetPort: 5000
+  selector:
+    app.io.service: flask-basic
+status:
+  loadBalancer: {}
